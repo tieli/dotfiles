@@ -4,6 +4,8 @@
 # xfce4
 #################
 
+yes | sudo add-apt-repository ppa:webupd8team/atom
+
 sudo apt-get update
 
 sudo apt-get install -y git vim keychain
@@ -20,6 +22,5 @@ sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-
 sudo apt-get install -y bum
 sudo apt-get install -y rcconf
 
-sudo add-apt-repository ppa:webupd8team/atom
 sudo apt-get install -y atom
 
