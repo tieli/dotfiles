@@ -138,3 +138,7 @@ DISPLAY=localhost:10.0
 export PATH=$PATH:/usr/local/go/bin
 
 export ANSIBLE_HOST_KEY_CHECKING=False
+
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
