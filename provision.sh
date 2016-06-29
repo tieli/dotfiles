@@ -17,5 +17,6 @@ sudo apt-get install -y libfreetype6 libfreetype6-dev libfontconfig1
 sudo apt-get install -y libfontconfig1-dev
 sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11
 
+sudo apt-get install -y bum
 sudo apt-get install -y rcconf
 
