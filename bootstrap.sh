@@ -2,7 +2,7 @@
 
 #Install Vundle
 mkdir -p .vim/bundle
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+cd ~/.vim/bundle && git clone https://github.com/VundleVim/Vundle.vim.git
 
 #Install Pathogen
 mkdir -p ~/.vim/autoload && \
@@ -29,12 +29,17 @@ echo 'export DISPLAY="10:0.0"' >> ~/.bashrc
 
 ln -s /vagrant/works ~/works
 
+# Install Python related stuff
+wget https://bootstrap.pypa.io/get-pip.py
+
 sudo python ~/get-pip.py
 sudo pip install virtualenv
+sudo pip install ansible
 
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 \curl -sSL https://get.rvm.io | bash -s stable
 
+# Install Ruby related stuff
 source /home/vagrant/.rvm/scripts/rvm
 rvm install 2.1.9
 rvm gemset create rails_4_1_15
@@ -46,3 +51,4 @@ rvm install 2.2.5
 rvm gemset use rails_4_2_6
 gem install rails -v 4.2.6
 rvm use ruby-2.2.5@rails_4_2_6 --default
+
