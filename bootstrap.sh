@@ -46,3 +46,4 @@ rvm install 2.2.5
 rvm gemset use rails_4_2_6
 gem install rails -v 4.2.6
 rvm use ruby-2.2.5@rails_4_2_6 --default
+
