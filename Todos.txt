@@ -1,0 +1,3 @@
+
+1. vimrc needs further work -- make it more organized
+
