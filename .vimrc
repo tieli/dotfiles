@@ -153,8 +153,7 @@ let perl_extended_vars = 1
 au FileType ruby set smartindent | set autoindent | set showmatch
 
 " Ruby
-au FileType ruby,eruby,yaml setlocal tabstop=2
-au FileType ruby,eruby,yaml setlocal shiftwidth=2
+"au FileType ruby,eruby,yaml setlocal softtabstop=2 | shiftwidth=2 | tabstop=2
 au FileType ruby,eruby,yaml setlocal softtabstop=2
 
 " Number of spaces that a pre-existing tab is equal to.
@@ -268,6 +267,7 @@ vnoremap <silent> _d :!perl -MO=Deparse 2>/dev/null<cr>
 "" autocommands
 "au FileType c,cpp call LoadCAbbrevs()
 "
+
 set nocompatible              " be iMproved, required
 if has("autocmd")
   filetype plugin indent on
@@ -293,16 +293,20 @@ Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'nelstrom/vim-markdown-folding'
 Plugin 'pangloss/vim-javascript'
 Plugin 'kchmck/vim-coffee-script'
-"Plugin 'elzr/vim-json'
+Plugin 'elzr/vim-json'
 Plugin 'groenewege/vim-less'
 Plugin 'Glench/Vim-Jinja2-Syntax'
 Plugin 'hynek/vim-python-pep8-indent'
+Plugin 'bash-support.vim'
 
 " Snippets are separated from the engine. Add this if you want them:
 Plugin 'honza/vim-snippets'
 
 " My personal vim file
 Plugin 'tieli/vim-misc'
+
+call vundle#end()
+filetype on
 
 ":setlocal foldmethod=indent
 "augroup vimrc
@@ -390,7 +394,7 @@ filetype indent on
 "set list
 "set listchars=tab:>-
 
-" As same as -X, -X option tells Vim to not try 
-" connecting to the X server
-set clipboard=exclude:.*
+let g:BASH_AuthorName   = 'Tiejun Li'
+let g:BASH_Email        = 'tiejli@yahoo.com'
+let g:BASH_Company      = 'SilkStudio Inc'
 
