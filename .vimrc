@@ -297,7 +297,8 @@ Plugin 'elzr/vim-json'
 Plugin 'groenewege/vim-less'
 Plugin 'Glench/Vim-Jinja2-Syntax'
 Plugin 'hynek/vim-python-pep8-indent'
-Plugin 'bash-support.vim'
+"Plugin 'bash-support.vim'
+Plugin 'tieli/bash-support.vim'
 
 " Snippets are separated from the engine. Add this if you want them:
 Plugin 'honza/vim-snippets'
