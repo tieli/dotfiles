@@ -286,9 +286,7 @@ Plugin 'itchyny/lightline.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'godlygeek/tabular'
 Plugin 'tpope/vim-sensible'
-
 Plugin 'kien/ctrlp.vim'
-
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'nelstrom/vim-markdown-folding'
 Plugin 'pangloss/vim-javascript'
@@ -297,6 +295,7 @@ Plugin 'elzr/vim-json'
 Plugin 'groenewege/vim-less'
 Plugin 'Glench/Vim-Jinja2-Syntax'
 Plugin 'hynek/vim-python-pep8-indent'
+" The official vim-bash-support
 "Plugin 'bash-support.vim'
 Plugin 'tieli/bash-support.vim'
 
@@ -356,6 +355,7 @@ set nofoldenable
 " Settings for ctrlp
 " cd ~/.vim/bundle
 " git clone https://github.com/kien/ctrlp.vim.git
+
 let g:ctrlp_max_height = 30
 set wildignore+=*.pyc
 set wildignore+=*_build/*
@@ -377,6 +377,9 @@ set encoding=utf-8
 "set paste toggle
 set pastetoggle=<F12>
 
+"allow mouse change curse position
+set mouse=a
+
 "filetype detect
 "filetype plugin on
 "syntax on
@@ -394,8 +397,11 @@ filetype indent on
 " and - through the rest of the tab.
 "set list
 "set listchars=tab:>-
+ 
+" vim bash-support
 
 let g:BASH_AuthorName   = 'Tiejun Li'
 let g:BASH_Email        = 'tiejli@yahoo.com'
 let g:BASH_Company      = 'SilkStudio Inc'
+let g:BASH_InsertFileHeader = 'yes'
 
