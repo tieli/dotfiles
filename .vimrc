@@ -378,7 +378,7 @@ set encoding=utf-8
 set pastetoggle=<F12>
 
 "allow mouse change curse position
-set mouse=a
+"set mouse=a
 
 "filetype detect
 "filetype plugin on
@@ -403,5 +403,5 @@ filetype indent on
 let g:BASH_AuthorName   = 'Tiejun Li'
 let g:BASH_Email        = 'tiejli@yahoo.com'
 let g:BASH_Company      = 'SilkStudio Inc'
-let g:BASH_InsertFileHeader = 'yes'
+let g:BASH_InsertFileHeader = 'no'
 
