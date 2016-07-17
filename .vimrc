@@ -405,3 +405,18 @@ let g:BASH_Email        = 'tiejli@yahoo.com'
 let g:BASH_Company      = 'SilkStudio Inc'
 let g:BASH_InsertFileHeader = 'no'
 
+"The same effect as -X option
+"  -X
+"  Do not try connecting to the X server to get the current
+"  window title and copy/paste using the X clipboard.  This
+"  avoids a long startup time when running Vim in a terminal
+"  emulator and the connection to the X server is slow.
+"  See --startuptime to find out if affects you.
+"  Only makes a difference on Unix or VMS, when compiled with 
+"  the +X11 feature.  Otherwise it's ignored.  To disable the 
+"  connection only for specific terminals, see the 'clipboard' 
+"  option. When the X11 Session Management Protocol (XSMP) 
+"  handler has been built in, the -X option also disables that 
+"  connection as it, too, may have undesirable delays.
+set clipboard=exclude:.*
+

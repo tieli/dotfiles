@@ -12,6 +12,9 @@ cd ~/.vim/bundle && git clone git://github.com/godlygeek/tabular.git
 
 ln -s /vagrant/works ~/works
 
+# Go back to home directory.
+cd ~
+
 # Install Python related stuff
 wget https://bootstrap.pypa.io/get-pip.py
 
@@ -20,7 +23,7 @@ sudo pip install virtualenv
 sudo pip install ansible
 
 # Fetch all rc files
-rc_files=(.railsrc .bashrc .gemrc .irbrc .ansible.cfg .bash_aliases .screenrc .gemrc)
+rc_files=(.railsrc .bashrc .gemrc .irbrc .ansible.cfg .bash_aliases .screenrc .gemrc .vimrc)
 
 root_url="https://raw.githubusercontent.com/tieli/dotfiles/master"
 
@@ -29,5 +32,4 @@ do
     echo "${root_url}/$rc_file"
     wget -N -P $HOME "${root_url}/$rc_file"
 done
-
 
