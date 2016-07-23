@@ -382,21 +382,15 @@ if has("autocmd")
   filetype plugin indent on
 endif
 
-"filetype off                  " required
-"
-"filetype on
-
-"filetype off
-
 "call pathogen#infect()
 "call pathogen#helptags()
 "
 "filetype plugin indent on
+"
 syntax on
 
 "filetype detect
 "filetype plugin on
-"syntax on
 
 filetype off                  " required
 filetype plugin on
