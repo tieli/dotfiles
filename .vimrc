@@ -382,9 +382,9 @@ if has("autocmd")
   filetype plugin indent on
 endif
 
-filetype off                  " required
-
-filetype on
+"filetype off                  " required
+"
+"filetype on
 
 filetype off
 
