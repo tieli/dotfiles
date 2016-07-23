@@ -386,19 +386,19 @@ endif
 "
 "filetype on
 
-filetype off
+"filetype off
 
 "call pathogen#infect()
 "call pathogen#helptags()
 "
-filetype plugin indent on
+"filetype plugin indent on
 syntax on
 
 "filetype detect
 "filetype plugin on
 "syntax on
 
-filetype off
+filetype off                  " required
 filetype plugin on
 filetype indent on
 
