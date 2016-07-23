@@ -1,0 +1,22 @@
+[user]
+	email = tiejli@yahoo.com
+	name = Tiejun Li
+
+[alias]
+        amend     = commit --amend -a
+    br        = branch
+        branch-cleanup = "!f() { git branch --merged ${1-master} | grep -v " ${1-master}$" | xargs -n 1 git branch -d; }; f"
+        co        = checkout
+        ds        = diff --staged
+        di        = diff
+    fetchall  = fetch -v --all
+        log-fancy = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
+# With git >= 1.8.3 you can use %C(auto) for the branch decorator (%d)
+        log-fancy = log --graph --pretty=format:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
+        log-me    = !UN=$(git config user.name)&& git log --author="\"$UN\"" --pretty=format:'%h %cd %s' --date=short
+    log-nice  = log --graph --decorate --pretty=oneline --abbrev-commit
+        panic     = !tar cvf ../git_panic.tar *
+        st        = status
+        wdiff     = diff --word-diff=plain
+        lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
+        l = ! git lg -n25

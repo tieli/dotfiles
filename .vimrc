@@ -57,10 +57,7 @@ set incsearch
 " syntax highlighting
 set bg=light
 "set bg=dark
-syntax on
-
-filetype detect
-
+"
 set cindent
 set cinkeys=0{,0},!^F,o,O,e " default is: 0{,0},0),:,0#,!^F,o,O,e
 
@@ -150,11 +147,11 @@ let perl_extended_vars = 1
 " au BufRead,BufNewFile *.py,*pyw set shiftwidth=4 | set expandtab
 
 " autoindent
-au FileType ruby set smartindent | set autoindent | set showmatch
+" au FileType ruby set smartindent | set autoindent | set showmatch
 
 " Ruby
 "au FileType ruby,eruby,yaml setlocal softtabstop=2 | shiftwidth=2 | tabstop=2
-au FileType ruby,eruby,yaml setlocal softtabstop=2
+" au FileType ruby,eruby,yaml setlocal softtabstop=2
 
 " Number of spaces that a pre-existing tab is equal to.
 " For the amount of space used for a new tab use shiftwidth.
@@ -268,11 +265,6 @@ vnoremap <silent> _d :!perl -MO=Deparse 2>/dev/null<cr>
 "au FileType c,cpp call LoadCAbbrevs()
 "
 
-set nocompatible              " be iMproved, required
-if has("autocmd")
-  filetype plugin indent on
-endif
-filetype off                  " required
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -299,14 +291,20 @@ Plugin 'hynek/vim-python-pep8-indent'
 "Plugin 'bash-support.vim'
 Plugin 'tieli/bash-support.vim'
 
-" Snippets are separated from the engine. Add this if you want them:
-Plugin 'honza/vim-snippets'
 
 " My personal vim file
 Plugin 'tieli/vim-misc'
 
+" Track the engine.
+Plugin 'SirVer/ultisnips'
+" Snippets are separated from the engine. Add 
+" this if you want them:
+Plugin 'honza/vim-snippets'
+
+Bundle 'vim-ruby/vim-ruby'
+
 call vundle#end()
-filetype on
+
 
 ":setlocal foldmethod=indent
 "augroup vimrc
@@ -339,11 +337,6 @@ set formatprg=par
 "set paste
 "
 
-filetype off
-"call pathogen#infect()
-"call pathogen#helptags()
-filetype plugin indent on
-syntax on
 
 " Disable stupid backup and swap file
 set nobackup
@@ -379,6 +372,27 @@ set pastetoggle=<F12>
 
 "allow mouse change curse position
 "set mouse=a
+
+set nocompatible              " be iMproved, required
+
+syntax on
+filetype detect
+
+if has("autocmd")
+  filetype plugin indent on
+endif
+
+filetype off                  " required
+
+filetype on
+
+filetype off
+
+"call pathogen#infect()
+"call pathogen#helptags()
+"
+filetype plugin indent on
+syntax on
 
 "filetype detect
 "filetype plugin on
