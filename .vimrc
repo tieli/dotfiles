@@ -49,6 +49,24 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
+"filetype indent on
+
+"allow mouse change curse position
+"set mouse=a
+
+set nocompatible              " be iMproved, required
+
+"syntax on
+filetype detect
+
+if has("autocmd")
+  filetype plugin indent on
+endif
+
+syntax on
+
+filetype off                  " required
+filetype plugin on
 filetype indent on
 
 " use visual bell instead of beeping
@@ -191,6 +209,7 @@ Plugin 'tieli/vim-misc'
 
 " Track the engine.
 Plugin 'SirVer/ultisnips'
+
 " Snippets are separated from the engine. Add 
 " this if you want them:
 Plugin 'honza/vim-snippets'
@@ -262,23 +281,23 @@ map <C-n> :NERDTreeToggle<CR>
 
 set encoding=utf-8
 
-"allow mouse change curse position
-"set mouse=a
-
-set nocompatible              " be iMproved, required
-
-syntax on
-filetype detect
-
-if has("autocmd")
-  filetype plugin indent on
-endif
-
-syntax on
-
-filetype off                  " required
-filetype plugin on
-filetype indent on
+""allow mouse change curse position
+""set mouse=a
+"
+"set nocompatible              " be iMproved, required
+"
+""syntax on
+"filetype detect
+"
+"if has("autocmd")
+"  filetype plugin indent on
+"endif
+"
+"syntax on
+"
+"filetype off                  " required
+"filetype plugin on
+"filetype indent on
 
 "set fdm=indent
 "set fdc=4
