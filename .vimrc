@@ -1,17 +1,17 @@
 
 " vimrc file for following the coding standards specified in PEP 7 & 8.
 "
-" All setting are protected by 'au' ('autocmd') statements.  Only files
+" All setting are protected by 'au' ('autocmd') statements. Only files
 " ending in .py or .pyw will trigger the Python settings while files
-" ending in *.c or *.h will trigger the C settings.  This makes the file
+" ending in *.c or *.h will trigger the C settings. This makes the file
 " safe in terms of only adjusting settings for Python and C files.
 "
 " Only basic settings needed to enforce the style guidelines are set.
-" Some suggested options are listed but commented out at the end of this
-" file.
+" Some suggested options are listed but commented out at the end of 
+" this file.
 
-" Number of spaces that a pre-existing tab is equal to.
-" For the amount of space used for a new tab use shiftwidth.
+" Number of spaces that a pre-existing tab is equal to For the amount  .
+" of space used for a new tab use shiftwidth                           .
 
 fu Select_c_style()
     if search('^\t', 'n', 150)
@@ -38,10 +38,13 @@ endif
 
 execute "colorscheme ".colorScheme
 
-set autoindent
+""""""""""""""""""""""""
+"  Global settings
+""""""""""""""""""""""""
 
 " set ts=2 sts=2 sw=2 noexpandtab
 
+set autoindent
 set expandtab
 set tabstop=4
 set shiftwidth=4
@@ -57,15 +60,15 @@ set incsearch
 " syntax highlighting
 set bg=light
 "set bg=dark
-"
+
+set number
+
 set cindent
 set cinkeys=0{,0},!^F,o,O,e " default is: 0{,0},0),:,0#,!^F,o,O,e
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-"
-"        Global settings
-"
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""
+"  Various Key Binding      
+"""""""""""""""""""""""""""
 
 " comment/uncomment blocks of code (in vmode)
 vmap _c :s/^/#/gi<Enter>
@@ -84,11 +87,24 @@ vmap <s-tab> <gv
 nmap <tab> I<tab><esc>
 nmap <s-tab> ^i<bs><esc>
 
-"" paste mode - this will avoid unexpected effects when you
-"" cut or copy some text from one window and paste it in Vim.
-" set paste
+"set paste
+"set paste toggle
+set pastetoggle=<F12>
 
-set number
+" When F5 is pressed, a numbered list of file names is 
+" printed, and the user needs to type a single number based 
+" on the \"menu\" and press enter. The \"menu\" disappears 
+" after choosing the number so it appears only when you 
+" need it.
+"
+:nnoremap <F5> :buffers<CR>:buffer<Space>
+
+" easy expansion to js (>) and compressing to coffeescript (<)
+vmap c< :!js2coffee<CR>
+vmap c> :!coffee --no-header -b -p -s<CR>
+nmap c< ggVG:!js2coffee<CR>
+nmap c> ggVG:!coffee --no-header -b -p -s<CR>:%s/};/};^M/g<CR> 
+nmap cc :! [[ \! -f %:r.coffee ]] && js2coffee % > %:r.coffee<CR>:sp %:r.coffee<CR> 
 
 "" Jump to the last position
 autocmd BufReadPost *
@@ -96,17 +112,16 @@ autocmd BufReadPost *
     \   exe "normal! g`\"" |
     \ endif
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-"
-"        Perl/Python/Ruby related stuff
-"
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""
+"  Perl/Python/Ruby related stuff
+"""""""""""""""""""""""""""""""""""
+
+au BufRead,BufNewFile *.c,*.h set tabstop=8
+au BufRead,BufNewFile *.c,*.h call Select_c_style()
 
 " autoindent
 au BufRead,BufNewFile *.pl syntax on | set ai
-au FileType perl set autoindent | set smartindent
-au FileType perl set showmatch
-au FileType perl set number
+au FileType perl set autoindent | set smartindent | set showmatch
 
 " check perl code with :make
 au FileType perl set makeprg=perl\ -c\ %\ $*
@@ -124,40 +139,6 @@ let perl_extended_vars = 1
 
 " au BufRead,BufNewFile *.py syntax on | set ai | set filetype=python
 " au BufRead,BufNewFile *.py syntax on | set ai
-
-" au BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class,print
-
-" autoindent
-" au FileType python setl autoindent tabstop=4 expandtab shiftwidth=4 softtabstop=4
-" au FileType python set smartindent | set autoindent | set showmatch
-
-" For full syntax highlighting:
-" let python_highlight_all=1
-"syntax on
-
-" Wrap text after a certain number of characters
-" Python: 79.
-" C: 79
-" au BufRead,BufNewFile *.py,*.pyw,*.c,*.h set textwidth=80 | set tabstop=4
-
-" What to use for an indent.
-" This will affect Ctrl-T and 'autoindent'.
-" Python: 4 spaces
-" C: tabs (pre-existing files) or 4 spaces (new files)
-" au BufRead,BufNewFile *.py,*pyw set shiftwidth=4 | set expandtab
-
-" autoindent
-" au FileType ruby set smartindent | set autoindent | set showmatch
-
-" Ruby
-"au FileType ruby,eruby,yaml setlocal softtabstop=2 | shiftwidth=2 | tabstop=2
-" au FileType ruby,eruby,yaml setlocal softtabstop=2
-
-" Number of spaces that a pre-existing tab is equal to.
-" For the amount of space used for a new tab use shiftwidth.
-au BufRead,BufNewFile *.c,*.h set tabstop=8
-au BufRead,BufNewFile *.c,*.h call Select_c_style()
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "            Makefile
@@ -181,90 +162,6 @@ vnoremap <silent> _t :!perltidy -q<Enter>
 nnoremap <silent> _d :.!perl -MO=Deparse 2>/dev/null<cr>
 vnoremap <silent> _d :!perl -MO=Deparse 2>/dev/null<cr>
 
-" -----------------------------------------------------
-"
-"            Suggest settings
-"
-"------------------------------------------------------
-
-" Set the default file encoding to UTF-8: ``set encoding=utf-8``
-
-" Puts a marker at the beginning of the file to differentiate
-" between UTF and UCS encoding (WARNING: can trick shells into thinking
-" a text file is actually a binary file when executing the text file):
-" ``set bomb``
-
-" For full syntax highlighting:
-"``let python_highlight_all=1``
-"``syntax on``
-
-" Automatically indent based on file type: ``filetype indent on``
-" Keep indentation level from previous line: ``set autoindent``
-
-" Folding based on indentation: ``set foldmethod=indent``
-
-"set nohlsearch
-"set ai
-"set showmatch
-"highlight SpecialKey ctermfg=DarkGray
-"set listchars=tab:>-,trail:~
-"set list
-"autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
-"set tabstop=4
-"set shiftwidth=4
-"set expandtab
-"set autoindent
-"set smartindent
-"syntax on
-"set listchars=tab:>-
-"set listchars+=trail:.
-"set ignorecase
-"set smartcase
-"
-
-"
-" vimrc file from Tavis Ormandy, security expert from Google
-"
-
-"" abbreviations for c programming
-"func LoadCAbbrevs()
-"    iabbr do do {<CR>} while ();<C-O>3h<C-O>
-"    iabbr for for (;;) {<CR>}<C-O>k<C-O>3l<C-O>
-"    iabbr switch switch () {<CR>}<C-O>k<C-O>6l<C-O>
-"    iabbr while while () {<CR>}<C-O>k<C-O>5l<C-O>
-"    iabbr if if () {<CR>}<C-O>k<C-O>2l<C-O>
-"    iabbr #d #define
-"    iabbr #i #include
-"endfunc
-"
-"set ci sc wmnu et nosol si bs=2 ls=2
-"set shm=IatA ww=<,>,[,] ts=4 sw=4
-"set lcs=eol:$,tab:>-,trail:.,extends:>
-"set pt=<F5> nomore modelines=5 modeline hls!
-"syn on
-"
-"ino <Down> <C-O>gj
-"ino <Up> <C-O>gk
-"nno <Down> gj
-"nno <Up> gk
-"
-"nno <F2> :set hls!<bar>set hls?<CR>
-"nno <F3> :set nu!<bar>set nu?<CR>
-"
-"colo torte
-"
-"" language dependent options
-"let asmsyntax="nasm"
-"let c_comment_strings=1
-"let c_space_errors=0
-"let rgb_file="/usr/lib/X11/rgb.txt"
-"let bash_is_sh=1
-"let highlight_function_name=1
-"
-"" autocommands
-"au FileType c,cpp call LoadCAbbrevs()
-"
-
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -282,15 +179,12 @@ Plugin 'kien/ctrlp.vim'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'nelstrom/vim-markdown-folding'
 Plugin 'pangloss/vim-javascript'
-Plugin 'kchmck/vim-coffee-script'
-Plugin 'elzr/vim-json'
-Plugin 'groenewege/vim-less'
+"Plugin 'elzr/vim-json'
 Plugin 'Glench/Vim-Jinja2-Syntax'
 Plugin 'hynek/vim-python-pep8-indent'
 " The official vim-bash-support
 "Plugin 'bash-support.vim'
 Plugin 'tieli/bash-support.vim'
-
 
 " My personal vim file
 Plugin 'tieli/vim-misc'
@@ -303,8 +197,12 @@ Plugin 'honza/vim-snippets'
 
 Bundle 'vim-ruby/vim-ruby'
 
-call vundle#end()
+Plugin 'valloric/MatchTagAlways'
+Plugin 'groenewege/vim-less'
+Plugin 'kchmck/vim-coffee-script'
+Plugin 'tpope/vim-surround'
 
+call vundle#end()
 
 ":setlocal foldmethod=indent
 "augroup vimrc
@@ -334,9 +232,6 @@ function! s:align()
 endfunction
 
 set formatprg=par
-"set paste
-"
-
 
 " Disable stupid backup and swap file
 set nobackup
@@ -359,16 +254,13 @@ set wildignore+=*/coverage/*
 let g:NERDTreeDirArrows = 0
 let g:NERDTreeWinSize=20
 let g:NERDTreeWinPos = "left"
+let g:NERDTreeDirArrowExpandable = '►'
+let g:NERDTreeDirArrowCollapsible = '▼'
 map <C-n> :NERDTreeToggle<CR>
 
 "let g:nerdtree_tabs_open_on_console_startup=1
 
 set encoding=utf-8
-
-"set mouse=a
-
-"set paste toggle
-set pastetoggle=<F12>
 
 "allow mouse change curse position
 "set mouse=a
@@ -382,15 +274,7 @@ if has("autocmd")
   filetype plugin indent on
 endif
 
-"call pathogen#infect()
-"call pathogen#helptags()
-"
-"filetype plugin indent on
-"
 syntax on
-
-"filetype detect
-"filetype plugin on
 
 filetype off                  " required
 filetype plugin on
@@ -406,7 +290,7 @@ filetype indent on
 "set list
 "set listchars=tab:>-
  
-" vim bash-support
+"vim bash-support
 
 let g:BASH_AuthorName   = 'Tiejun Li'
 let g:BASH_Email        = 'tiejli@yahoo.com'
@@ -427,4 +311,18 @@ let g:BASH_InsertFileHeader = 'no'
 "  handler has been built in, the -X option also disables that 
 "  connection as it, too, may have undesirable delays.
 set clipboard=exclude:.*
+" 
+" UltiSnips Settings
+"
+let g:UltiSnipsListSnippets = '<F11>'
+
+" 
+" Better JSON for VIM
+"
+" concealing of double quotes
+let g:vim_json_syntax_conceal = 0
+
+"set background=dark
+map <F2> i#!/bin/bash<ESC>
+map <F3> o#This file was created on <ESC>:r!date "+\%x"<ESC>kj
 
