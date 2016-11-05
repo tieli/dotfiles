@@ -9,28 +9,38 @@
 VAGRANTFILE_API_VERSION = "2"
 
 $vm_script  = <<-SCRIPT
+
 sudo apt-get update
-sudo apt-get install -y git vim
+sudo apt-get install -y git vim build-essential libssl-dev libffi-dev python-dev
+
 mkdir -p ~/.vim/bundle
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+#mkdir -p ~/.vim/autoload && \
+#curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+vim_rc_url="https://raw.githubusercontent.com/tieli/dotfiles/master/.vimrc"
+wget -N -P $HOME $vim_rc_url
+
 vim +PluginInstall +qall
+
+ln -s /vagrant/works ~/works
+
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python ~/get-pip.py
+sudo pip install virtualenv
+sudo pip install ansible
+
 SCRIPT
 
-$hosts_script = <<-SCRIPT
-echo "10.0.0.1 server server.silkstyle.com" >> /etc/hosts
-echo "10.0.0.2 server1 server1.silkstyle.com" >> /etc/hosts
-echo "10.0.0.3 server2 server2.silkstyle.com" >> /etc/hosts
-echo "10.0.0.4 server3 server3.silkstyle.com" >> /etc/hosts
-echo "10.0.0.10 chef chef.silkstyle.com" >> /etc/hosts
-echo "10.0.0.11 chef12 chef12.silkstyle.com" >> /etc/hosts
+# Install chef, this needs be run in previledge mode
+$chef_script  = <<-SCRIPT
+curl -L https://www.opscode.com/chef/install.sh | bash
 SCRIPT
-
-misc_dir       = "works/misc"
 
 bootstrap_url  = "https://raw.githubusercontent.com/tieli/dotfiles/master/bootstrap.sh"
 install_ruby   = "https://raw.githubusercontent.com/tieli/dotfiles/master/install_ruby.sh"
 install_rvm    = "https://raw.githubusercontent.com/tieli/dotfiles/master/install_rvm.sh"
-fetch_rcfiles  = "https://raw.githubusercontent.com/tieli/dotfiles/master/fetch_dotfiles.sh"
 
 INTERFACE_NAME = "Qualcomm Atheros AR9485WB-EG Wireless Network Adapter"
 
@@ -48,7 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, ip: "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2200, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2200
+    svr.ssh.port = 2200 + index * 10
 
     guest_ports = [3000, 4000, 4567, 5000, 8000, 8080]
     guest_ports.each do |guest_port|
@@ -71,12 +81,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :public_network, bridge: INTERFACE_NAME
     svr.vm.network :private_network, ip: "10.0.0." + index.to_s
 
-    svr.vm.network :forwarded_port, guest: 22, host: 2210, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2210
+    ssh_port = 2200 + (index-1) * 10
+    svr.vm.network :forwarded_port, guest: 22, host: ssh_port, auto_correct: false, id: "ssh"
+    svr.ssh.port = ssh_port
+    svr.ssh.forward_agent = true
+    svr.ssh.forward_x11 = true
 
-    guest_ports = [3000, 4567, 5000, 8000, 8080] #3000/rails 4567/sinatra 5000/flask 8000/django
+    guest_ports = [3000, 4567, 5000, 8000, 8080, 9292] #3000/rails 4567/sinatra 5000/flask 8000/django
     guest_ports.each do |guest_port|
-      host_port = guest_port + index * 10000
+      host_port = guest_port + (index / 6 + 1) * 10000 + (index % 10)
       svr.vm.network :forwarded_port, guest: guest_port, host: host_port
     end
 
@@ -86,7 +99,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # end
 
     svr.vm.provision :shell, inline: $vm_script
-    svr.vm.provision :shell, inline: $hosts_script
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -103,27 +115,54 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :public_network, bridge: INTERFACE_NAME
     svr.vm.network :private_network, ip: "10.0.0." + index.to_s
 
-    svr.vm.network :forwarded_port, guest: 22, host: 2220, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2220
+    ssh_port = 2200 + (index-1) * 10
+    svr.vm.network :forwarded_port, guest: 22, host: ssh_port, auto_correct: false, id: "ssh"
+    svr.ssh.port = ssh_port
 
-    guest_ports = [3000, 4000, 4567, 5000, 8000, 8080]
+    guest_ports = [80, 3000, 4000, 4567, 5000, 8000, 8080]
     guest_ports.each do |guest_port|
-      host_port = guest_port + index * 10000
+      host_port = guest_port + (index / 6 + 1) * 10000 + (index % 10)
       svr.vm.network :forwarded_port, guest: guest_port, host: host_port
     end
 
-    # svr.vm.provision :shell, path: bootstrap_url, privileged: false
-    svr.vm.provision :shell, path: fetch_rcfiles, privileged: false
+    svr.omnibus.chef_version = "12.10.24"
 
-    #
-    # svr.vm.provision :chef_solo do |chef|
-    #   chef.channel = "stable"
-    #   chef.version = "12.10.24"
-    #   chef.cookbooks_path = "chef-repo/cookbooks"
-    #   chef.add_recipe "apache2"
-    #  end
+    svr.berkshelf.berksfile_path = "chef-repo/Berksfile"
+    svr.berkshelf.enabled = true
 
-    #svr.vm.provision :shell, inline: $hosts_script
+    svr.vm.provision :chef_solo do |chef|
+       chef.json = {
+        :group => {
+          :name => "tli",
+          :gid => "1002"
+        },
+        :user => {
+          :password => "$1$Gc0f84N8$2OZRFIMW.jsFXfyY1OkuL/", #theplaintextpassword
+          :name => "tli",
+          :uid => "1002",
+          :gid => "1002",
+          :shell => "/bin/bash",
+          :ls_color => true
+        }
+      }
+
+      # or
+      # chef.add_recipe "main::default"
+      # chef.add_recipe "main::package"
+
+      chef.run_list = [
+            "recipe[main::default]",
+            "recipe[main::package]",
+            "recipe[main::database]",
+            "recipe[main::web]",
+      ]
+
+     end
+
+    svr.vm.provision :shell, path: bootstrap_url, privileged: false
+    svr.vm.provision :shell, path: install_rvm, args: "stable", privileged: false
+    svr.vm.provision :shell, path: install_ruby, args: "2.2.5 rails 4.2.6", privileged: false
+    svr.vm.provision :shell, path: install_ruby, args: "2.1.9 rails 4.2.6", privileged: false
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -141,7 +180,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, ip: "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2230, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2230
+    svr.ssh.port = 2200 + index * 10
 
     guest_ports = [3000, 4000, 4567, 5000, 8000, 8080]
     guest_ports.each do |guest_port|
@@ -149,25 +188,42 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       svr.vm.network :forwarded_port, guest: guest_port, host: host_port
     end
 
-    # Dir.foreach(misc_dir) do |item|
-    #   next if item == '.' or item == '..'
-    #   svr.vm.provision "file", source: File.join(misc_dir, item), destination: item
-    # end
+    svr.omnibus.chef_version = "12.10.24"
 
-    svr.vm.provision :shell, path: bootstrap_url, privileged: false
+    svr.berkshelf.berksfile_path = "chef-repo/Berksfile"
+    svr.berkshelf.enabled = true
 
     svr.vm.provision :chef_solo do |chef|
-      chef.channel = "stable"
-      chef.version = "12.10.24"
-      chef.cookbooks_path = ["chef-repo/cookbooks", "chef-repo/cookbooks_tli"]
-      chef.add_recipe "mysql::server"
-      chef.add_recipe "mysql::client"
-      chef.add_recipe "apache2"
-    end
+       chef.json = {
+        :group => {
+          :name => "tli",
+          :gid => "1002"
+        },
+        :user => {
+          :password => "$1$Gc0f84N8$2OZRFIMW.jsFXfyY1OkuL/", #theplaintextpassword
+          :name => "tli",
+          :uid => "1002",
+          :gid => "1002",
+          :shell => "/bin/bash",
+          :ls_color => true
+        }
+      }
 
-    #svr.vm.provision :shell, inline: $hosts_script
+      chef.run_list = [
+            "recipe[main::default]",
+            "recipe[main::package]",
+            "recipe[main::database]",
+            "recipe[main::web]",
+      ]
 
-    svr.vm.provider :virtualbox do |vb|
+     end
+
+    svr.vm.provision :shell, path: bootstrap_url, privileged: false
+    svr.vm.provision :shell, path: install_rvm, args: "stable", privileged: false
+    svr.vm.provision :shell, path: install_ruby, args: "2.2.5 rails 4.2.6", privileged: false
+    svr.vm.provision :shell, path: install_ruby, args: "2.1.9 rails 4.2.6", privileged: false
+
+     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
       vb.memory = 512
     end
@@ -183,7 +239,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, ip: "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2240, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2240
+    svr.ssh.port = 2200 + index * 10
 
     guest_ports = [3000, 4000, 4567, 5000, 8000, 8080]
     guest_ports.each do |guest_port|
@@ -219,15 +275,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         }
       }
 
-      #chef.add_recipe "main::default"
+      chef.add_recipe "main::default"
 
     end
 
     config.vm.provision :shell, path: install_rvm, args: "stable", privileged: false
     config.vm.provision :shell, path: install_ruby, args: "2.2.5 rails 4.2.6", privileged: false
     config.vm.provision :shell, path: install_ruby, args: "2.1.9 rails 4.1.15", privileged: false
-    #svr.vm.provision :shell, path: bootstrap_url, privileged: false
-    #svr.vm.provision :shell, inline: $hosts_script
+    svr.vm.provision :shell, path: bootstrap_url, privileged: false
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -245,7 +300,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2310, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2310
+    svr.ssh.port = 2200 + index * 10
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -263,7 +318,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2320, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2320
+    svr.ssh.port = 2200 + index * 10
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -281,7 +336,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2330, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2330
+    svr.ssh.port = 2200 + index * 10
 
     svr.vm.provision :chef_solo do |chef|
       chef.cookbooks_path = "chef-repo/cookbooks"
@@ -307,7 +362,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     web.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     web.vm.network :forwarded_port, guest: 22, host: 2340, auto_correct: false, id: "ssh"
-    web.ssh.port = 2340
+    web.ssh.port = 2200 + index * 10
 
     web.vm.provision :chef_solo do |chef|
       chef.cookbooks_path = "chef-repo/cookbooks"
@@ -337,7 +392,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     db.vm.network :forwarded_port, guest: 22, host: 2350, auto_correct: false, id: "ssh"
-    db.ssh.port = 2350
+    db.ssh.port = 2200 + index * 10
 
     db.vm.provider :virtualbox do |vb|
       vb.gui = true
@@ -355,7 +410,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     web.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     web.vm.network :forwarded_port, guest: 22, host: 2360, auto_correct: false, id: "ssh"
-    web.ssh.port = 2360
+    web.ssh.port = 2200 + index * 10
 
     web.vm.provider :virtualbox do |vb|
       vb.gui = true
@@ -369,22 +424,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.box = "ubuntu/trusty64"
     svr.vm.hostname = "test"
 
-    svr.vm.network :forwarded_port, guest: 22, host: 2410, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2410
-
-    svr.vm.provision :shell, path: bootstrap_url, privileged: false
-
-    svr.vm.provision :ansible_local do |ansible|
-      ansible.playbook = "playbook.yml"
-      ansible.verbose = "vv"
-      ansible.sudo = true
-    end
-
     svr.vm.network :public_network, bridge: INTERFACE_NAME
     svr.vm.network :private_network, ip: "10.0.0." + index.to_s
 
+    ssh_port = 2200 + (index-1) * 10
+    svr.vm.network :forwarded_port, guest: 22, host: ssh_port, auto_correct: false, id: "ssh"
+    svr.ssh.port = ssh_port
+
+    guest_ports = [3000, 4567, 5000, 8000, 8080, 9292] #3000/rails 4567/sinatra 5000/flask 8000/django
+    guest_ports.each do |guest_port|
+      host_port = guest_port + (index / 6 + 1) * 10000 + (index % 10)
+      svr.vm.network :forwarded_port, guest: guest_port, host: host_port
+    end
+
+    svr.vm.provision :shell, inline: $vm_script, privileged: false
+    svr.vm.provision :shell, path: $chef_script
+
     svr.vm.provider :virtualbox do |vb|
-      vb.gui = true
+      vb.gui = false
       vb.memory = 512
     end
   end
@@ -399,7 +456,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2420, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2420
+    svr.ssh.port = 2200 + index * 10
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -417,12 +474,53 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.vm.network :private_network, :ip => "10.0.0." + index.to_s
 
     svr.vm.network :forwarded_port, guest: 22, host: 2430, auto_correct: false, id: "ssh"
-    svr.ssh.port = 2430
+    svr.ssh.port = 2200 + index * 10
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
       vb.memory = 2048
     end
+  end
+
+  config.vm.define :test1 do |svr|
+
+    index = 23
+
+    svr.vm.box = "ubuntu/trusty64"
+    svr.vm.hostname = "test1"
+
+    svr.vm.network :forwarded_port, guest: 22, host: 2440, auto_correct: false, id: "ssh"
+    svr.ssh.port = 2200 + index * 10
+
+    #svr.vm.provision :shell, path: bootstrap_url, privileged: false
+
+    # svr.vm.provision :ansible_local do |ansible|
+    #   ansible.playbook = "playbook.yml"
+    #   ansible.verbose = "vv"
+    #   ansible.sudo = true
+    # end
+
+    svr.vm.network :public_network, bridge: INTERFACE_NAME
+    svr.vm.network :private_network, ip: "10.0.0." + index.to_s
+
+    svr.vm.provider :virtualbox do |vb|
+      vb.gui = true
+      vb.memory = 512
+    end
+  end
+
+
+  config.vm.define :laravel do |svr|
+
+    index = 24
+
+    svr.vm.box = "laravel/homestead"
+
+    svr.vm.provider :virtualbox do |vb|
+      vb.gui = false
+      vb.memory = 1024
+    end
+
   end
 
   vms = [

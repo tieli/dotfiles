@@ -181,6 +181,8 @@ nnoremap <silent> _d :.!perl -MO=Deparse 2>/dev/null<cr>
 vnoremap <silent> _d :!perl -MO=Deparse 2>/dev/null<cr>
 
 
+filetype off                  " required
+
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -333,7 +335,13 @@ set clipboard=exclude:.*
 " 
 " UltiSnips Settings
 "
+let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsListSnippets = '<F11>'
+let g:UltiSnipsSnippetsDir="~/.vim/UltiSnips"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+let g:UltiSnipsEditSplit="vertical"
 
 " 
 " Better JSON for VIM
