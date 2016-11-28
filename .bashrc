@@ -116,7 +116,8 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
-export DISPLAY=":0.0"
+#export DISPLAY=":0.0"
+export DISPLAY='127.0.0.1:10.0'
 
 export NODE_PATH=/usr/lib/node_modules:$NODE_PATH
 
@@ -126,14 +127,11 @@ PERL_LOCAL_LIB_ROOT="/home/vagrant/perl5${PERL_LOCAL_LIB_ROOT+:}${PERL_LOCAL_LIB
 PERL_MB_OPT="--install_base \"/home/vagrant/perl5\""; export PERL_MB_OPT;
 PERL_MM_OPT="INSTALL_BASE=/home/vagrant/perl5"; export PERL_MM_OPT;
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
 export JAVA_HOME=/home/vagrant/works/src/java
 export JUNIT_HOME=/home/vagrant/works/src/java
 export CLASSPATH=$CLASSPATH:$JUNIT_HOME/junit-4.12.jar:.
 export CLASSPATH=$CLASSPATH:$JUNIT_HOME/hamcrest-core-1.3.jar
 
-DISPLAY=localhost:10.0
 
 export PATH=$PATH:/usr/local/go/bin
 
@@ -141,4 +139,9 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 
 export VISUAL=vim
 export EDITOR="$VISUAL"
+
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export PATH="/home/vagrant/.rvm/rubies/ruby-2.2.5/bin/ruby:$PATH" # Add RVM to PATH for scripting
+export PATH="~/.composer/vendor/bin:$PATH"
 
