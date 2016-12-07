@@ -30,6 +30,7 @@ wget https://bootstrap.pypa.io/get-pip.py
 sudo python ~/get-pip.py
 sudo pip install virtualenv
 sudo pip install ansible
+sudo pip install pexpect
 
 SCRIPT
 
@@ -37,6 +38,21 @@ SCRIPT
 $chef_script  = <<-SCRIPT
 curl -L https://www.opscode.com/chef/install.sh | bash
 SCRIPT
+
+user_json = {
+  :group => {
+    :name => "tli",
+    :gid => "1002"
+  },
+  :user => {
+    :password => "$1$Gc0f84N8$2OZRFIMW.jsFXfyY1OkuL/", #theplaintextpassword
+    :name => "tli",
+    :uid => "1002",
+    :gid => "1002",
+    :shell => "/bin/bash",
+    :ls_color => true
+  }
+}
 
 bootstrap_url  = "https://raw.githubusercontent.com/tieli/dotfiles/master/bootstrap.sh"
 install_ruby   = "https://raw.githubusercontent.com/tieli/dotfiles/master/install_ruby.sh"
@@ -93,12 +109,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       svr.vm.network :forwarded_port, guest: guest_port, host: host_port
     end
 
-    # svr.vm.provision :chef_solo do |chef|
-    #   chef.cookbooks_path = "chef-repo/cookbooks"
-    #   chef.add_recipe "apache2"
-    # end
+    svr.omnibus.chef_version = "12.10.24"
 
-    svr.vm.provision :shell, inline: $vm_script
+    svr.berkshelf.berksfile_path = "chef-repo/Berksfile"
+    svr.berkshelf.enabled = true
+
+    svr.vm.provision :chef_solo do |chef|
+      chef.json = user_json
+      chef.run_list = [
+            "recipe[main::default]",
+            "recipe[main::package]",
+      ]
+    end
+
+    svr.vm.provision :shell, path: bootstrap_url, privileged: false
+    svr.vm.provision :shell, path: install_rvm, args: "stable", privileged: false
+    svr.vm.provision :shell, path: install_ruby, args: "2.2.5 rails 4.2.6", privileged: false
+    svr.vm.provision :shell, path: install_ruby, args: "2.1.9 rails 4.2.6", privileged: false
+
+    svr.vm.provision :shell, inline: $vm_script, privileged: false
 
     svr.vm.provider :virtualbox do |vb|
       vb.gui = false
@@ -131,20 +160,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.berkshelf.enabled = true
 
     svr.vm.provision :chef_solo do |chef|
-       chef.json = {
-        :group => {
-          :name => "tli",
-          :gid => "1002"
-        },
-        :user => {
-          :password => "$1$Gc0f84N8$2OZRFIMW.jsFXfyY1OkuL/", #theplaintextpassword
-          :name => "tli",
-          :uid => "1002",
-          :gid => "1002",
-          :shell => "/bin/bash",
-          :ls_color => true
-        }
-      }
+      chef.json = user_json
 
       # or
       # chef.add_recipe "main::default"
@@ -153,11 +169,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.run_list = [
             "recipe[main::default]",
             "recipe[main::package]",
-            "recipe[main::database]",
-            "recipe[main::web]",
+            #"recipe[main::database]",
+            #"recipe[main::web]",
       ]
 
-     end
+    end
 
     svr.vm.provision :shell, path: bootstrap_url, privileged: false
     svr.vm.provision :shell, path: install_rvm, args: "stable", privileged: false
@@ -194,20 +210,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.berkshelf.enabled = true
 
     svr.vm.provision :chef_solo do |chef|
-       chef.json = {
-        :group => {
-          :name => "tli",
-          :gid => "1002"
-        },
-        :user => {
-          :password => "$1$Gc0f84N8$2OZRFIMW.jsFXfyY1OkuL/", #theplaintextpassword
-          :name => "tli",
-          :uid => "1002",
-          :gid => "1002",
-          :shell => "/bin/bash",
-          :ls_color => true
-        }
-      }
+      chef.json = user_json
 
       chef.run_list = [
             "recipe[main::default]",
@@ -258,23 +261,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     svr.berkshelf.enabled = true
 
     svr.vm.provision :chef_solo do |chef|
-      chef.json = {
-        :mysql => {
-          :server_root_password => 'rootpass',
-          :server_debian_password => 'debpass',
-          :server_repl_password => 'replpass',
-          :data_dir => '/var/lib/mysql',
-          :port => '3306'
-        },
-        :user => {
-          :password => "$1$b1o.o2AV$jiHA0nIgzpe7SuAl677Vr/",
-          :name => "vagrant",
-          :uid => "1050",
-          :gid => "150",
-          :ls_color => true
-        }
-      }
-
+      chef.json = user_json
       chef.add_recipe "main::default"
 
     end
