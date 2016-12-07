@@ -33,6 +33,7 @@ log-nice  = log --graph --decorate --pretty=oneline --abbrev-commit
 # Push the current branch to the remote "origin", and set it to track
 # the upstream branch
     publish = "!git push -u origin $(git branch-name)"
+    pub     = "!git push -u origin $(git branch-name)"
 # Delete the remote version of the current branch
     unpublish = "!git push origin :$(git branch-name)"
 # Delete a branch and recreate it from master — useful if you have, say,
