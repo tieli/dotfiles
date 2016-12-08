@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ## Fetch all rc files
-rc_files=(.railsrc .bashrc .gemrc .irbrc .ansible.cfg .bash_aliases .screenrc .gemrc .vimrc)
+rc_files=(.gitconfig .railsrc .bashrc .gemrc .irbrc .ansible.cfg .bash_aliases .screenrc .gemrc .vimrc)
 
 root_url="https://raw.githubusercontent.com/tieli/dotfiles/master"
 
