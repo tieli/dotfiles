@@ -34,7 +34,7 @@ sudo pip install ansible
 sudo pip install pexpect
 
 # setting up keychain
-ssh-keygen -f .ssh/id_rsa -t rsa -N 'overtheriverthroughthewoods'
-ssh-keygen -f .ssh/id_dsa -t dsa -N 'overtheriverthroughthewoods'
+ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''
+ssh-keygen -f $HOME/.ssh/id_dsa -t dsa -N ''
 
 
