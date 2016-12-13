@@ -6,15 +6,19 @@ rvm use --default --install $1
 
 shift
 
-if [ $# -gt 0 ]
-then
-    name=$1
-    version=$2
+name=$1
+
+shift
+
+while [ $# -gt 0 ]
+do
+    version=$1
     gemset=${name}_${version}
     rvm gemset create ${gemset}
     rvm gemset use ${gemset}
     gem install $name -v $version
-fi
+    shift
+done
 
 rvm cleanup all
 
