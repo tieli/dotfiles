@@ -18,6 +18,13 @@ vim +PluginInstall +qall
 
 ln -s /vagrant/works ~/works
 
+lsb_release -r | grep "12.04"
+
+if [ $? -eq 0 ]; then
+    # install vim 7
+    sudo add-apt-repository ppa:nmi/vim-snapshots
+fi
+
 sudo apt-get update
 sudo apt-get install -y git vim build-essential libssl-dev libffi-dev python-dev
 
@@ -36,5 +43,10 @@ sudo pip install pexpect
 # setting up keychain
 ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''
 ssh-keygen -f $HOME/.ssh/id_dsa -t dsa -N ''
+
+# install composer
+sudo curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> $HOME/.bashrc
 
 
