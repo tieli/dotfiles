@@ -11,11 +11,6 @@ do
     wget -N -P $HOME "${root_url}/$rc_file"
 done
 
-vim_rc_url="https://raw.githubusercontent.com/tieli/dotfiles/master/.vimrc"
-wget -N -P $HOME $vim_rc_url
-
-vim +PluginInstall +qall
-
 ln -s /vagrant/works ~/works
 
 lsb_release -r | grep "12.04"
@@ -33,6 +28,11 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 #mkdir -p ~/.vim/autoload && \
 #curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+vim_rc_url="https://raw.githubusercontent.com/tieli/dotfiles/master/.vimrc"
+wget -N -P $HOME $vim_rc_url
+
+vim +PluginInstall +qall
 
 wget https://bootstrap.pypa.io/get-pip.py
 sudo python ~/get-pip.py
