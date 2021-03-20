@@ -1,7 +1,7 @@
 ecdsa==0.13
 extras==0.0.3
 Fabric==1.10.2
-Flask==0.10.1
+Flask==1.0
 Flask-SQLAlchemy==2.0
 funcsigs==0.4
 fuzzywuzzy==0.6.2
