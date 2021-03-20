@@ -1,4 +1,4 @@
-ecdsa==0.13
+ecdsa==0.13.3
 extras==0.0.3
 Fabric==1.10.2
 Flask==0.10.1
