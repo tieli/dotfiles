@@ -6,7 +6,7 @@ Flask-SQLAlchemy==2.0
 funcsigs==0.4
 fuzzywuzzy==0.6.2
 itsdangerous==0.24
-Jinja2==2.8
+Jinja2==2.11.3
 lettuce==0.2.20
 linecache2==1.0.0
 MarkupSafe==0.23
